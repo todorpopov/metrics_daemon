@@ -1,5 +1,5 @@
 CC      = gcc
-CFLAGS  = -Wall -Wextra -Werror -std=c11 -Iinclude
+CFLAGS  = -Wall -Wextra -Werror -std=c11 -Iinclude -Iinclude/metrics -Iinclude/server
 LDFLAGS =
 
 TARGET  = metrics_daemon
@@ -9,15 +9,15 @@ SRC_DIR = src
 OBJ_DIR = build/$(ARCH)
 BIN_DIR = bin/$(ARCH)
 
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+SRCS = $(shell find $(SRC_DIR) -name '*.c')
+OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
 $(BIN_DIR)/$(TARGET): $(OBJS)
 	@mkdir -p $(BIN_DIR)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean

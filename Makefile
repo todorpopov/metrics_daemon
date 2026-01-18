@@ -1,5 +1,6 @@
+VERSION = $(shell cat VERSION.txt)
 CC      = gcc
-CFLAGS  = -Wall -Wextra -Werror -std=c11 -Iinclude -Iinclude/metrics -Iinclude/server
+CFLAGS  = -Wall -Wextra -Werror -std=c11 -DVERSION=\"$(VERSION)\" -Iinclude -Iinclude/metrics -Iinclude/server
 LDFLAGS =
 
 TARGET  = metrics_daemon
@@ -25,7 +26,7 @@ clean:
 	rm -rf build bin
 
 build_native_image:
-	docker build -t metrics_daemon .
+	docker build --build-arg VERSION=$(VERSION) -t metrics_daemon:$(VERSION) -t metrics_daemon:latest .
 
 build_linux_image:
-	docker build --platform=linux/amd64 -t metrics_daemon .
+	docker build --build-arg VERSION=$(VERSION) --platform=linux/amd64 -t metrics_daemon:$(VERSION) -t metrics_daemon:latest .

@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
-#include "memory.h"
+
+#include "metrics.h"
 #include "server.h"
 
 void handle_request(int connfd, const char *request __attribute__((unused))) {
-    const char *body = get_memory_metrics(FORMAT_JSON);
+    enum metrics_format format = FORMAT_JSON;
+
+    const char *body = get_metrics(format);
     if (body == NULL) {
         const char *error_response = "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 21\r\n\r\nInternal Server Error";
         send(connfd, error_response, strlen(error_response), 0);
@@ -14,9 +17,28 @@ void handle_request(int connfd, const char *request __attribute__((unused))) {
 
     char response[8192];
     int body_len = strlen(body);
-    snprintf(response, sizeof(response),
-             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n%s",
-             body_len, body);
+    switch (format) {
+        case FORMAT_JSON:
+            snprintf(
+                response,
+                sizeof(response),
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n%s",
+                body_len,
+                body
+            );
+            break;
+        default:
+            body = "Unsupported format";
+            snprintf(
+                response,
+                sizeof(response),
+                "HTTP/1.1 400 Bad Request\r\nContent-Length: %d\r\n\r\n%s",
+                (int)strlen(body),
+                body
+            );
+            break;
+    }
+
     send(connfd, response, strlen(response), 0);
 }
 

@@ -62,12 +62,19 @@ char *format_mem_info(const struct mem_info *info, enum metrics_format format) {
     printf("Starting format_mem_info\n");
     static char formatted[512];
 
-    if (format == FORMAT_JSON) {
-        snprintf(formatted, sizeof(formatted),
-                 "{ \"total_memory_kb\": %lu, \"free_memory_kb\": %lu }",
-                 info->total_memory, info->free_memory);
-    } else {
-        snprintf(formatted, sizeof(formatted), "Unsupported format");
+    switch (format)
+    {
+        case FORMAT_JSON:
+            snprintf(
+                formatted,
+                sizeof(formatted),
+                "{ \"total_memory_kb\": %lu, \"free_memory_kb\": %lu }",
+                info->total_memory,
+                info->free_memory);
+            break;
+        default:
+            snprintf(formatted, sizeof(formatted), "Unsupported format");
+            break;
     }
 
     return formatted;

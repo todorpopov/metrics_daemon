@@ -65,8 +65,8 @@ void server_run_until_complete(server_config_t *config) {
         close(listen_fd);
         return;
     }
-    
-    if (listen(listen_fd, 10) < 0) {
+
+    if (listen(listen_fd, LISTEN_QUEUE_SIZE) < 0) {
         perror("listen");
         close(listen_fd);
         return;

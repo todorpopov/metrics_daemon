@@ -9,6 +9,8 @@
 #define DEFAULT_PORT 8080
 #define MAXLINE 1024
 #define SA struct sockaddr
+#define LISTEN_QUEUE_SIZE 10
+
 
 typedef void (*request_handler)(int connfd, const char *request);
 

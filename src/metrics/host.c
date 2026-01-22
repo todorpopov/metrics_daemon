@@ -1,7 +1,17 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
 #include "metrics.h"
 #include "host.h"
+
+char *get_host_file_path() {
+    char *host_file_path_str = getenv("HOST_FILE_PATH_OVERRIDE");
+    if (host_file_path_str != NULL) {
+        return host_file_path_str;
+    }
+    return HOST_FILE_PATH;
+}
 
 char *read_host_name(const char *host_file_path) {
     FILE *file = fopen(host_file_path, "r");
@@ -38,7 +48,7 @@ char *format_host_name(const char *host_name, enum metrics_format format) {
 }
 
 char *get_host_name(enum metrics_format format) {
-    char *host_name = read_host_name(HOST_FILE_PATH);
+    char *host_name = read_host_name(get_host_file_path());
     if (host_name == NULL) {
         return NULL;
     }

@@ -1,10 +1,20 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
 #include "metrics.h"
 #include "memory.h"
 
 #define MAX_LINE_LENGTH 256
 #define MAX_LINES 256
+
+char *get_mem_file_path() {
+    char *mem_file_path_str = getenv("MEM_FILE_PATH_OVERRIDE");
+    if (mem_file_path_str != NULL) {
+        return mem_file_path_str;
+    }
+    return MEM_FILE_PATH;
+}
 
 char *read_mem_file(const char *mem_file_path) {
     printf("Starting read_mem_file\n");
@@ -83,7 +93,7 @@ char *format_mem_info(const struct mem_info *info, enum metrics_format format) {
 char *get_memory_metrics(enum metrics_format format) {
     printf("Starting get_memory_metrics\n");
 
-    char *mem_file_content = read_mem_file(MEM_FILE_PATH);
+    char *mem_file_content = read_mem_file(get_mem_file_path());
     if (mem_file_content == NULL) {
         return NULL;
     }

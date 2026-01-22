@@ -5,6 +5,8 @@
 
 #define MEM_FILE_PATH "/proc/meminfo"
 
+char *get_mem_file_path();
+
 struct mem_info {
     unsigned long total_memory;
     unsigned long free_memory;

@@ -14,7 +14,7 @@ spec:
       labels:
         app: metrics-daemon
     spec:
-      hostNetwork: false
+      hostNetwork: true
       containers:
       - name: metrics-daemon
         image: 100.109.199.26:30500/metrics_daemon:latest
@@ -22,6 +22,11 @@ spec:
         - name: http
           containerPort: 8080
           protocol: TCP
+        env:
+        - name: HOST_FILE_PATH_OVERRIDE
+          value: "/host/proc/sys/kernel/hostname"
+        - name: MEM_FILE_PATH_OVERRIDE
+          value: "/host/proc/meminfo"
         volumeMounts:
         - name: proc
           mountPath: /host/proc

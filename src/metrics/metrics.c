@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "metrics.h"
 #include "memory.h"
@@ -26,4 +27,32 @@ char *get_metrics(enum metrics_format format) {
     }
 
     return result;
+}
+
+char *format_response(enum metrics_format format, const char *body) {
+    static char response[8192];
+    int body_len = strlen(body);
+
+    switch (format) {
+        case FORMAT_JSON:
+            snprintf(
+                response,
+                sizeof(response),
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n%s",
+                body_len,
+                body
+            );
+            break;
+        default:
+            body = "Unsupported format";
+            snprintf(
+                response,   
+                sizeof(response),
+                "HTTP/1.1 400 Bad Request\r\nContent-Length: %d\r\n\r\n%s",
+                body_len,
+                body
+            );
+            break;
+    }
+    return response;
 }

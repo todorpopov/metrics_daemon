@@ -1,2 +1,2 @@
 # Metrics Daemon
-Dependency free C binary that can scrape Linux host system metric and expose them over TCP
+Dependency free C binary that can lookup Linux metrics and expose them over a TCP server

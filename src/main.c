@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <sys/socket.h>
 
 #include "metrics.h"
@@ -15,30 +14,7 @@ void handle_request(int connfd, const char *request __attribute__((unused))) {
         return;
     }
 
-    char response[8192];
-    int body_len = strlen(body);
-    switch (format) {
-        case FORMAT_JSON:
-            snprintf(
-                response,
-                sizeof(response),
-                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n%s",
-                body_len,
-                body
-            );
-            break;
-        default:
-            body = "Unsupported format";
-            snprintf(
-                response,
-                sizeof(response),
-                "HTTP/1.1 400 Bad Request\r\nContent-Length: %d\r\n\r\n%s",
-                (int)strlen(body),
-                body
-            );
-            break;
-    }
-
+    char *response = format_response(format, body);
     send(connfd, response, strlen(response), 0);
 }
 

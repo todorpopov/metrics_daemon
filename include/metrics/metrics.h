@@ -6,5 +6,6 @@ enum metrics_format {
 };
 
 char *get_metrics(enum metrics_format format);
+char *format_response(enum metrics_format format, const char *body);
 
 #endif

@@ -1,4 +1,4 @@
-#define _GNU_SOURCE
+#define GNU_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,51 +8,32 @@
 #include "memory.h"
 #include "host.h"
 
-char *get_metrics(enum metrics_format format) {
-    char *mem_metrics = get_memory_metrics(format);
-    char *host_metrics = get_host_name(format);
-
-    if (mem_metrics == NULL || host_metrics == NULL) {
-        return NULL;
+int get_metrics(struct metrics_t *metrics) {
+    const char *raw_mem_info = read_mem_file(get_mem_file_path());
+    const char *host_name = read_host_name(get_host_file_path());
+    if (raw_mem_info == NULL || host_name == NULL) {
+        return 1;
     }
 
-    char *result = NULL;
+    metrics->mem_info.total_memory = 0;
+    metrics->mem_info.free_memory = 0;
+    parse_mem_info(&metrics->mem_info, raw_mem_info);
 
-    switch (format) {
-    case FORMAT_JSON:
-        asprintf(&result, "{ \"memory\": %s, \"host\": %s }", mem_metrics, host_metrics);
-        break;
-    default:
-        return NULL;
-    }
+    strncpy(metrics->host_name, host_name, sizeof(metrics->host_name) - 1);
+    metrics->host_name[sizeof(metrics->host_name) - 1] = '\0';
 
-    return result;
+    return 0;
 }
 
-char *format_response(enum metrics_format format, const char *body) {
-    static char response[8192];
-    int body_len = strlen(body);
-
-    switch (format) {
-        case FORMAT_JSON:
-            snprintf(
-                response,
-                sizeof(response),
-                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n%s",
-                body_len,
-                body
-            );
-            break;
-        default:
-            body = "Unsupported format";
-            snprintf(
-                response,   
-                sizeof(response),
-                "HTTP/1.1 400 Bad Request\r\nContent-Length: %d\r\n\r\n%s",
-                body_len,
-                body
-            );
-            break;
-    }
-    return response;
+char *format_metrics_json(const struct metrics_t *metrics) {
+    static char json[512];
+    snprintf(
+        json,
+        sizeof(json),
+        "{ \"memory\": { \"total_memory\": %lu, \"free_memory\": %lu }, \"host_name\": \"%s\" }",
+        metrics->mem_info.total_memory,
+        metrics->mem_info.free_memory,
+        metrics->host_name
+    );
+    return json;
 }

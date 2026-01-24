@@ -1,3 +1,4 @@
 # Ignore build and binary directories
+.idea
 build
 bin

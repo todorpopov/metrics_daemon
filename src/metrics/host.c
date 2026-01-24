@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "metrics.h"
 #include "host.h"
 
 char *get_host_file_path() {
@@ -14,6 +13,8 @@ char *get_host_file_path() {
 }
 
 char *read_host_name(const char *host_file_path) {
+    printf("Opening file: %s\n", host_file_path);
+
     FILE *file = fopen(host_file_path, "r");
     static char hostname[256] = "";
     hostname[0] = '\0';
@@ -31,26 +32,6 @@ char *read_host_name(const char *host_file_path) {
     }
 
     fclose(file);
+    printf("Host name: %s\n", hostname);
     return hostname;
-}
-
-char *format_host_name(const char *host_name, enum metrics_format format) {
-    static char formatted[512];
-    formatted[0] = '\0';
-
-    if (format == FORMAT_JSON) {
-        snprintf(formatted, sizeof(formatted), "{ \"hostname\": \"%s\" }", host_name);
-    } else {
-        snprintf(formatted, sizeof(formatted), "Unsupported format");
-    }
-
-    return formatted;
-}
-
-char *get_host_name(enum metrics_format format) {
-    char *host_name = read_host_name(get_host_file_path());
-    if (host_name == NULL) {
-        return NULL;
-    }
-    return format_host_name(host_name, format);
 }

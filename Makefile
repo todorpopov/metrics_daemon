@@ -25,8 +25,5 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 clean:
 	rm -rf build bin
 
-build_arm_image:
-	docker build --build-arg VERSION=$(VERSION) --platform=linux/arm64 -t metrics_daemon:$(VERSION) -t metrics_daemon:latest .
-
 build_x86_image:
 	docker buildx build --platform linux/amd64 -t infra:30500/metrics_daemon:$(VERSION) -t infra:30500/metrics_daemon:latest --push .
